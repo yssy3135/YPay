@@ -1,0 +1,3 @@
+rootProject.name = 'YPay'
+include 'membership-service'
+
