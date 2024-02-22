@@ -9,7 +9,6 @@ import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-@Builder
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class RegisterMembershipCommand extends SelfValidating<RegisterMembershipCommand> {
@@ -31,11 +30,12 @@ public class RegisterMembershipCommand extends SelfValidating<RegisterMembership
     private final boolean isCorp;
 
 
-    public RegisterMembershipCommand(String name, String email, String address, boolean isValid, boolean isCorp) {
+    @Builder
+    public RegisterMembershipCommand(String name, String email, String address, boolean isCorp) {
         this.name = name;
         this.email = email;
         this.address = address;
-        this.isValid = isValid;
+        this.isValid = true;
         this.isCorp = isCorp;
 
         this.validateSelf();
