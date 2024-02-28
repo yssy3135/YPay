@@ -1,15 +1,11 @@
 package com.ypay.membership.application.service;
 
-import com.ypay.membership.adapter.out.persistence.MembershipJpaEntity;
+import com.ypay.common.UseCase;
 import com.ypay.membership.adapter.out.persistence.MembershipMapper;
 import com.ypay.membership.application.port.in.FindMembershipCommand;
 import com.ypay.membership.application.port.in.FindMembershipUseCase;
-import com.ypay.membership.application.port.in.RegisterMembershipCommand;
-import com.ypay.membership.application.port.in.RegisterMembershipUseCase;
 import com.ypay.membership.application.port.out.FindMembershipPort;
-import com.ypay.membership.application.port.out.RegisterMembershipPort;
 import com.ypay.membership.domain.Membership;
-import common.UseCase;
 import lombok.RequiredArgsConstructor;
 
 import javax.transaction.Transactional;

@@ -1,15 +1,16 @@
-package common;
+package com.ypay.common;
 
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.stereotype.Component;
 
+import java.awt.*;
 import java.lang.annotation.*;
 
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Component
-public @interface UseCase {
+public @interface PersistenceAdapter {
 
 
     @AliasFor(annotation = Component.class)

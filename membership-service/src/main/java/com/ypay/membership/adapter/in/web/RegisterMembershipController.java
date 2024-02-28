@@ -1,14 +1,13 @@
 package com.ypay.membership.adapter.in.web;
 
-import com.ypay.membership.adapter.out.persistence.MembershipJpaEntity;
+import com.ypay.common.WebAdapter;
 import com.ypay.membership.application.port.in.RegisterMembershipCommand;
 import com.ypay.membership.application.port.in.RegisterMembershipUseCase;
 import com.ypay.membership.domain.Membership;
-import common.WebAdapter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-// WebAdapter
+// com.ypay.common.WebAdapter
 @WebAdapter
 @RestController
 @RequiredArgsConstructor

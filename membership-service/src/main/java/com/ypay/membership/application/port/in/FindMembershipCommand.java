@@ -1,6 +1,6 @@
 package com.ypay.membership.application.port.in;
 
-import common.SelfValidating;
+import com.ypay.common.SelfValidating;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
