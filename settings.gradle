@@ -1,4 +1,4 @@
-rootProject.name = 'YPay'
+rootProject.name = 'ypay'
 include 'membership-service'
 include 'common'
 
