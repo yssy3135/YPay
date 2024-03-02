@@ -11,5 +11,4 @@ public interface RegisterBankAccountPort {
             RegisteredBankAccount.BankAccountNumber bankAccountNumber,
             RegisteredBankAccount.LinkedStatusIsValid linkedStatusIsValid
     );
-
 }

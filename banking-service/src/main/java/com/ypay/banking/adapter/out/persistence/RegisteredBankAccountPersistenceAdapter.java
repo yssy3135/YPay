@@ -1,5 +1,6 @@
 package com.ypay.banking.adapter.out.persistence;
 
+import com.ypay.banking.application.port.out.FindBankAccountPort;
 import com.ypay.banking.application.port.out.RegisterBankAccountPort;
 import com.ypay.banking.domain.RegisteredBankAccount;
 import com.ypay.common.PersistenceAdapter;
@@ -7,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 
 @PersistenceAdapter
 @RequiredArgsConstructor
-public class RegisteredBankAccountPersistenceAdapter implements RegisterBankAccountPort {
+public class RegisteredBankAccountPersistenceAdapter implements RegisterBankAccountPort, FindBankAccountPort {
 
     private final RegisteredBankAccountRepository bankAccountRepository;
 
@@ -22,5 +23,11 @@ public class RegisteredBankAccountPersistenceAdapter implements RegisterBankAcco
                         linkedStatusIsValid.isLinkedStatusIsValid()
                 )
         );
+    }
+
+    @Override
+    public RegisteredBankAccountJpaEntity findBankAccount(RegisteredBankAccount.MembershipId membershipId) {
+
+        return bankAccountRepository.findByMembershipId(membershipId.getMembershipId()).orElseThrow(() -> new RuntimeException("not found"));
     }
 }
