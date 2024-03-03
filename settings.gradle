@@ -1,4 +1,5 @@
 rootProject.name = 'ypay'
 include 'membership-service'
 include 'common'
+include 'banking-service'
 
