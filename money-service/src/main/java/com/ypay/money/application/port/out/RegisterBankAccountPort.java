@@ -1,7 +1,8 @@
 package com.ypay.money.application.port.out;
 
+
 import com.ypay.banking.adapter.out.persistence.RegisteredBankAccountJpaEntity;
-import com.ypay.banking.domain.RegisteredBankAccount;
+import com.ypay.money.domain.RegisteredBankAccount;
 
 public interface RegisterBankAccountPort {
 

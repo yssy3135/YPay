@@ -24,7 +24,7 @@ public class MoneyChangingRequestPersistenceAdapter implements IncreaseMoneyPort
                         targetMembershipId.getTargetMembershipId(),
                         moneyChangingType.getMoneyChangingType(),
                         changingMoneyAmount.getChangingMoneyAmount(),
-                        new Timestamp(System.currentTimeMillis()), // TODO: 2021-08-17 11:00:00
+                        new Timestamp(System.currentTimeMillis()),
                         moneyChangingStatus.getChangingMoneyStatus(),
                         UUID.randomUUID()
                 )
