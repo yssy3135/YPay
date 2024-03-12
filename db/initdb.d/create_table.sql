@@ -1,5 +1,5 @@
-CREATE DATABASE IF NOT EXISTS y_pay;
-USE y_pay;
+CREATE DATABASE IF NOT EXISTS ypay;
+USE ypay;
 
 -- for Axon Framework (for Mismatching of Axon and Mysql)
 -- create table IF NOT EXISTS dead_letter_entry (
