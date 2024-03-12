@@ -1,5 +1,7 @@
 FROM openjdk:11-slim-stretch
-EXPOSE 8000
+EXPOSE 8080
 ARG JAR_FILE
 COPY ${JAR_FILE} app.jar
-ENTRYPOINT ["JAVA", "-jar", "/app.jar"]
+#"-Djava.security.egd=file:/dev/./urandom",
+#"-Dspring.profiles.active=prod",
+ENTRYPOINT ["java", "-jar", "/app.jar"]
