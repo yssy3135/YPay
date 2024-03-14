@@ -6,6 +6,8 @@ import com.ypay.banking.adapter.out.persistence.RegisteredBankAccountJpaEntity;
 import com.ypay.banking.adapter.out.persistence.RegisteredBankAccountMapper;
 import com.ypay.banking.application.port.in.RegisterBankAccountCommand;
 import com.ypay.banking.application.port.in.RegisterBankAccountUseCase;
+import com.ypay.banking.application.port.out.GetMembershipPort;
+import com.ypay.banking.application.port.out.MembershipStatus;
 import com.ypay.banking.application.port.out.RegisterBankAccountPort;
 import com.ypay.banking.application.port.out.RequestBankAccountInfoPort;
 import com.ypay.banking.domain.RegisteredBankAccount;
@@ -15,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 @UseCase
 @RequiredArgsConstructor
 public class RegisterBankAccountService implements RegisterBankAccountUseCase {
+
+    private final GetMembershipPort getMembershipPort;
 
     private final RegisterBankAccountPort registerBankAccountPort;
 
@@ -27,7 +31,13 @@ public class RegisterBankAccountService implements RegisterBankAccountUseCase {
 
         // 은행 계좌를 등록하는 서비스 (비즈니스)
 
-        // 멤버 서비스도 확인? 여기서는 skip
+        // call membership 정상인지 확인
+        // call extenal bank 정상인지 확인
+        MembershipStatus membershipStatus = getMembershipPort.getMembership(command.getMembershipId());
+
+        if(!membershipStatus.isValid()) {
+            return null;
+        }
 
         // 1. 외부 실제 은행에 등록이 가능한 계좌인지(정상인지) 확인
         // 외부의 은행에 이 계좌 정상인지 확인 필요
