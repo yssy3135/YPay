@@ -1,6 +1,7 @@
 package com.ypay.money.application.service;
 
 import com.ypay.banking.application.port.out.GetMembershipPort;
+import com.ypay.common.CountDownLatchManager;
 import com.ypay.common.RechargingMoneyTask;
 import com.ypay.common.SubTask;
 import com.ypay.common.UseCase;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @UseCase
@@ -24,6 +26,7 @@ import java.util.UUID;
 @Transactional
 public class IncreaseMoneyRequestService implements IncreaseMoneyRequestUseCase {
 
+    private final CountDownLatchManager countDownLatchManager;
     private final IncreaseMoneyPort increaseMoneyPort;
     private final MoneyChangingRequestMapper mapper;
     private final GetMembershipPort getMembershipPort;
@@ -110,13 +113,26 @@ public class IncreaseMoneyRequestService implements IncreaseMoneyRequestUseCase 
         // 2. Kafka Cluster Produce
         // Task Produce
         sendRechargingMoneyTaskPort.sendRechargingMoneyTaskPort(task);
-
+        countDownLatchManager.addCountDownLatch(task.getTaskID());
         // 3. wait
+        try {
+            countDownLatchManager.getCountDownLatch(task.getTaskID()).await();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
         // 3-1. task-consumer
         // 등록된 sub-task, 수행하고 모두 ok -> task 결과를 Produce
 
         // 4. Task Result Consume
+        // 받은 응답을 다시, countDownLatchManger를 통해서 결과 데이터를 받아야한다.
+        String result = countDownLatchManager.getDataForKey(task.getTaskID());
+        if(result.equals("success")) {
+            // 4-1. Consume ok, Logic
+
+        } else {
+            // 4-2/ Consume fail Logic
+        }
         // 5. Consume ok, Logic
 
 
