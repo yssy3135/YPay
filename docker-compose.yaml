@@ -59,6 +59,7 @@ services:
       - SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop
       - KAFKA_CLUSTERS_BOOTSTRAPSERVERS=kafka:29092
       - LOGGING_TOPIC=ypay.logging.out.stdout
+      - SERVICE_MEMBERSHIP_URL=http://membership:8080
 
   money-service:
     image: ypay-money-service:1.0.0
@@ -80,7 +81,8 @@ services:
       - SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop
       - KAFKA_CLUSTERS_BOOTSTRAPSERVERS=kafka:29092
       - LOGGING_TOPIC=ypay.logging.out.stdout
-        
+      - TASK_TOPIC=ypay.task.topic
+
   zookeeper:
     image: 'arm64v8/zookeeper:3.8'
     networks:
@@ -137,6 +139,20 @@ services:
     environment:
       - KAFKA_CLUSTERS_BOOTSTRAPSERVERS=kafka:29092
       - LOGGING_TOPIC=ypay.logging.out.stdout
+
+
+  task-consumer:
+    image: ypay-task-consumer:1.0.0
+    networks:
+      - ypay_network
+    restart: always
+    depends_on:
+      - kafka
+      - zookeeper
+    environment:
+      - KAFKA_CLUSTERS_BOOTSTRAPSERVERS=kafka:29092
+      - TASK_TOPIC=ypay.task.topic
+      - TASK_RESULT_TOPIC=ypay.task.result.topic
 
 networks:
   ypay_network:
