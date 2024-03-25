@@ -5,8 +5,11 @@ import com.ypay.common.CountDownLatchManager;
 import com.ypay.common.RechargingMoneyTask;
 import com.ypay.common.SubTask;
 import com.ypay.common.UseCase;
+import com.ypay.money.adapter.axon.command.MemberMoneyCreatedCommand;
 import com.ypay.money.adapter.out.persistence.MemberMoneyJpaEntity;
 import com.ypay.money.adapter.out.persistence.MoneyChangingRequestMapper;
+import com.ypay.money.application.port.in.CreateMemberMoneyCommand;
+import com.ypay.money.application.port.in.CreateMemberMoneyUseCase;
 import com.ypay.money.application.port.in.IncreaseMoneyRequestCommand;
 import com.ypay.money.application.port.in.IncreaseMoneyRequestUseCase;
 import com.ypay.money.application.port.out.IncreaseMoneyPort;
@@ -14,6 +17,7 @@ import com.ypay.money.application.port.out.SendRechargingMoneyTaskPort;
 import com.ypay.money.domain.MemberMoney;
 import com.ypay.money.domain.MoneyChangingRequest;
 import lombok.RequiredArgsConstructor;
+import org.axonframework.commandhandling.gateway.CommandGateway;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -24,13 +28,14 @@ import java.util.UUID;
 @UseCase
 @RequiredArgsConstructor
 @Transactional
-public class IncreaseMoneyRequestService implements IncreaseMoneyRequestUseCase {
+public class IncreaseMoneyRequestService implements IncreaseMoneyRequestUseCase, CreateMemberMoneyUseCase {
 
     private final CountDownLatchManager countDownLatchManager;
     private final IncreaseMoneyPort increaseMoneyPort;
     private final MoneyChangingRequestMapper mapper;
     private final GetMembershipPort getMembershipPort;
     private final SendRechargingMoneyTaskPort sendRechargingMoneyTaskPort;
+    private final CommandGateway commandGateway;
 
 
     @Override
@@ -137,6 +142,21 @@ public class IncreaseMoneyRequestService implements IncreaseMoneyRequestUseCase 
 
 
         return null;
+    }
+
+    @Override
+    public void createMemberMoney(CreateMemberMoneyCommand command) {
+        MemberMoneyCreatedCommand axonCommand = new MemberMoneyCreatedCommand(command.getMembershipId());
+
+        commandGateway.send(axonCommand).whenComplete((result, throwable) -> {
+           if(throwable != null ) {
+               System.out.println("throwable = " + throwable);
+               throw new RuntimeException(throwable);
+           } else {
+               System.out.println("result = " + result);
+           }
+
+        });
     }
 }
 
