@@ -10,7 +10,6 @@ public class MemberMoney {
     @Getter private final String memberMoneyId;
 
     @Getter private final String membershipId;
-
     // 잔액
     @Getter private final int balance;
 
@@ -51,4 +50,14 @@ public class MemberMoney {
         }
         int balance ;
     }
+
+    @Value
+    public static class MoneyAggregateIdentifier {
+        public MoneyAggregateIdentifier(String aggregateIdentifier) {
+            this.aggregateIdentifier = aggregateIdentifier;
+        }
+        String aggregateIdentifier ;
+    }
+
+
 }

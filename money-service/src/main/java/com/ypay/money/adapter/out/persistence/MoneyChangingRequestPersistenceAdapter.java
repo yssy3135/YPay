@@ -1,6 +1,8 @@
 package com.ypay.money.adapter.out.persistence;
 
 import com.ypay.common.PersistenceAdapter;
+import com.ypay.money.application.port.out.CreateMemberMoneyPort;
+import com.ypay.money.application.port.out.GetMemberMoneyPort;
 import com.ypay.money.application.port.out.IncreaseMoneyPort;
 import com.ypay.money.domain.MemberMoney;
 import com.ypay.money.domain.MoneyChangingRequest;
@@ -12,7 +14,7 @@ import java.util.UUID;
 
 @PersistenceAdapter
 @RequiredArgsConstructor
-public class MoneyChangingRequestPersistenceAdapter implements IncreaseMoneyPort {
+public class MoneyChangingRequestPersistenceAdapter implements IncreaseMoneyPort, CreateMemberMoneyPort, GetMemberMoneyPort {
 
     private final SpringDataMoneyChangingRequestRepository moneyChangingRequestRepository;
 
@@ -43,7 +45,8 @@ public class MoneyChangingRequestPersistenceAdapter implements IncreaseMoneyPort
         } catch (Exception e){
             entity = new MemberMoneyJpaEntity(
                     Long.parseLong(memberId.getMembershipId()),
-                    increaseMoneyAmount
+                    increaseMoneyAmount,
+                    ""
             );
             entity = memberMoneyRepository.save(entity);
             return entity;
@@ -52,5 +55,31 @@ public class MoneyChangingRequestPersistenceAdapter implements IncreaseMoneyPort
 //
 //        entity.setBalance(entity.getBalance() + increaseMoneyAmount);
 //        return  memberMoneyRepository.save(entity);
+    }
+
+    @Override
+    public void createMemberMoney(MemberMoney.MembershipId membershipId, MemberMoney.MoneyAggregateIdentifier moneyAggregateIdentifier) {
+        MemberMoneyJpaEntity entity = new MemberMoneyJpaEntity(
+                Long.parseLong(membershipId.getMembershipId()),
+                0,
+                moneyAggregateIdentifier.getAggregateIdentifier());
+
+        memberMoneyRepository.save(entity);
+    }
+
+
+    @Override
+    public MemberMoneyJpaEntity getMemberMoney(MemberMoney.MembershipId memberId) {
+        MemberMoneyJpaEntity entity;
+        List<MemberMoneyJpaEntity> entityList =  memberMoneyRepository.findByMembershipId(Long.parseLong(memberId.getMembershipId()));
+        if(entityList.isEmpty()){
+            entity = new MemberMoneyJpaEntity(
+                    Long.parseLong(memberId.getMembershipId()),
+                    0, ""
+            );
+            entity = memberMoneyRepository.save(entity);
+            return entity;
+        }
+        return  entityList.get(0);
     }
 }
