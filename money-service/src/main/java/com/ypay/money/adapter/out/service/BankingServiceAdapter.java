@@ -34,6 +34,7 @@ public class BankingServiceAdapter implements GetRegisteredBankAccountPort {
             return new RegisteredBankAccountAggregateIdentifier(
                     registeredBankAccount.getRegisteredBankAccountId()
                     , registeredBankAccount.getAggregateIdentifier()
+                    , membershipId
                     , registeredBankAccount.getBankName()
                     , registeredBankAccount.getBankAccountNumber()
             );
