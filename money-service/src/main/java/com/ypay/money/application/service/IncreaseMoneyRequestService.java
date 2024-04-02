@@ -7,6 +7,7 @@ import com.ypay.common.SubTask;
 import com.ypay.common.UseCase;
 import com.ypay.money.adapter.axon.command.IncreaseMemberMoneyCommand;
 import com.ypay.money.adapter.axon.command.MemberMoneyCreatedCommand;
+import com.ypay.money.adapter.axon.command.RechargingMoneyRequestCreateCommand;
 import com.ypay.money.adapter.out.persistence.MemberMoneyJpaEntity;
 import com.ypay.money.adapter.out.persistence.MoneyChangingRequestMapper;
 import com.ypay.money.application.port.in.CreateMemberMoneyCommand;
@@ -169,16 +170,15 @@ public class IncreaseMoneyRequestService implements IncreaseMoneyRequestUseCase,
 
     @Override
     public void increaseMoneyRequestByEvent(IncreaseMoneyRequestCommand command) {
-        MemberMoneyJpaEntity memberMoneyJpaEntity = getMemberMoneyPort.getMemberMoney(
-                new MemberMoney.MembershipId(command.getTargetMembershipId())
-        );
+        MemberMoneyJpaEntity memberMoneyJpaEntity = getMemberMoneyPort.getMemberMoney(new MemberMoney.MembershipId(command.getTargetMembershipId()));
+        String memberMoneyAggregateIdentifier = memberMoneyJpaEntity.getAggregateIdentifier();
 
-        String aggregateIdentifier = memberMoneyJpaEntity.getAggregateIdentifier();
-
-        commandGateway.send(IncreaseMemberMoneyCommand.builder()
-                        .aggregateIdentifier(aggregateIdentifier)
-                        .membershipId(command.getTargetMembershipId())
-                        .amount(command.getAmount()).build())
+        //saga의 시작을 나타내는 커맨드!
+        // RechargingMoneyRequestCreateCommand
+        commandGateway.send(new RechargingMoneyRequestCreateCommand(memberMoneyAggregateIdentifier,
+                UUID.randomUUID().toString(),
+                command.getTargetMembershipId(),
+                command.getAmount()))
                 .whenComplete(
                         (result, throwable) -> {
                             if (throwable != null) {
@@ -193,6 +193,28 @@ public class IncreaseMoneyRequestService implements IncreaseMoneyRequestUseCase,
                             }
                         }
                 );
+
+
+//        String aggregateIdentifier = memberMoneyJpaEntity.getAggregateIdentifier();
+//
+//        commandGateway.send(IncreaseMemberMoneyCommand.builder()
+//                        .aggregateIdentifier(aggregateIdentifier)
+//                        .membershipId(command.getTargetMembershipId())
+//                        .amount(command.getAmount()).build())
+//                .whenComplete(
+//                        (result, throwable) -> {
+//                            if (throwable != null) {
+//                                throwable.printStackTrace();
+//                                throw new RuntimeException(throwable);
+//                            } else {
+//                                // Increase money -> money incr
+//                                System.out.println("increaseMoney result = " + result);
+//                                increaseMoneyPort.increaseMoney(
+//                                        new MemberMoney.MembershipId(command.getTargetMembershipId())
+//                                        , command.getAmount());
+//                            }
+//                        }
+//                );
     }
 
 }
