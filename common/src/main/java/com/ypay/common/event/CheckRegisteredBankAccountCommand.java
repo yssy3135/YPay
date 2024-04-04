@@ -18,6 +18,14 @@ public class CheckRegisteredBankAccountCommand {
 
     private String membershipId;
 
+    private String checkRegisterBankAccountId;
+
+    private String bankName;
+
+    private String bankAccountNumber;
+
+    private int amount;
+
 
 
 
