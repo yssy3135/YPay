@@ -2,7 +2,11 @@ package com.ypay.banking.adapter.axon.aggregate;
 
 import com.ypay.banking.adapter.axon.command.CreateRegisteredBankAccountCommand;
 import com.ypay.banking.adapter.axon.event.CreateRegisteredBankAccountEvent;
+import com.ypay.banking.adapter.out.external.bank.BankAccount;
+import com.ypay.banking.adapter.out.external.bank.GetBankAccountRequest;
+import com.ypay.banking.application.port.out.RequestBankAccountInfoPort;
 import com.ypay.common.event.CheckRegisteredBankAccountCommand;
+import com.ypay.common.event.CheckedRegisteredBankAccountEvent;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
@@ -39,13 +43,39 @@ public class RegisteredBankAccountAggregate {
 
     }
 
-    public void handle(@NotNull CheckRegisteredBankAccountCommand command) {
+    @CommandHandler
+    public void handle(@NotNull CheckRegisteredBankAccountCommand command, RequestBankAccountInfoPort requestBankAccountInfoPort) {
         System.out.println("CheckRegisteredBankAccountCommand Handler");
 
         // command를 통해 이 어그리거트(RegisteredBankAccount) 가 정상인지를 확인해야 한다.
-        // port.get
+        id = command.getAggregateIdentifier();
 
-//        command.get
+        //Check! Registered BankAccount
+        BankAccount account = requestBankAccountInfoPort.getBankAccountInfo(
+                GetBankAccountRequest.builder()
+                        .bankAccountNumber(command.getBankAccountNumber())
+                        .bankName(command.getBankName())
+                        .build()
+        );
+
+        boolean isValidAccount = account.isValid();
+
+        String firmbankingUUID = UUID.randomUUID().toString();
+
+        // CheckedRegisteredBankAccountEvent
+        // 잘 체크 되었다.
+        apply(new CheckedRegisteredBankAccountEvent(
+                        command.getRechargeRequestId()
+                        , command.getCheckRegisterBankAccountId()
+                        , command.getMembershipId()
+                        , isValidAccount
+                        , command.getAmount()
+                        , firmbankingUUID
+                        , account.getBankName()
+                        , account.getBankAccountNumber()
+                )
+        );
+
 
     }
 
