@@ -60,6 +60,7 @@ services:
       - KAFKA_CLUSTERS_BOOTSTRAPSERVERS=kafka:29092
       - LOGGING_TOPIC=ypay.logging.out.stdout
       - SERVICE_MEMBERSHIP_URL=http://membership:8080
+      - SERVICE_BANKING_URL=http://banking-service:8080
 
   money-service:
     image: ypay-money-service:1.0.0
@@ -82,6 +83,7 @@ services:
       - KAFKA_CLUSTERS_BOOTSTRAPSERVERS=kafka:29092
       - LOGGING_TOPIC=ypay.logging.out.stdout
       - TASK_TOPIC=ypay.task.topic
+      - SERVICE_BANKING_URL=http://banking-service:8080
 
   zookeeper:
     image: 'arm64v8/zookeeper:3.8'
@@ -117,7 +119,7 @@ services:
     container_name: kafka-ui
     networks:
       - ypay_network
-    ports:
+    ports:service.banking.url
       - "8989:8080"
     restart: always
     depends_on:

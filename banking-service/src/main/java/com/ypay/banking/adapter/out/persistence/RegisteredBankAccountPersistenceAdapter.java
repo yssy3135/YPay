@@ -7,6 +7,7 @@ import com.ypay.banking.application.port.out.RegisterBankAccountPort;
 import com.ypay.banking.domain.RegisteredBankAccount;
 import com.ypay.common.PersistenceAdapter;
 import lombok.RequiredArgsConstructor;
+import org.axonframework.modelling.command.AggregateIdentifier;
 
 import java.util.List;
 
@@ -17,14 +18,15 @@ public class RegisteredBankAccountPersistenceAdapter implements RegisterBankAcco
     private final SpringDataRegisteredBankAccountRepository bankAccountRepository;
 
     @Override
-    public RegisteredBankAccountJpaEntity registerBankAccount(RegisteredBankAccount.MembershipId membershipId, RegisteredBankAccount.BankName bankName, RegisteredBankAccount.BankAccountNumber bankAccountNumber, RegisteredBankAccount.LinkedStatusIsValid linkedStatusIsValid) {
+    public RegisteredBankAccountJpaEntity registerBankAccount(RegisteredBankAccount.MembershipId membershipId, RegisteredBankAccount.BankName bankName, RegisteredBankAccount.BankAccountNumber bankAccountNumber, RegisteredBankAccount.LinkedStatusIsValid linkedStatusIsValid, RegisteredBankAccount.AggregateIdentifier aggregateIdentifier) {
 
         return bankAccountRepository.save(
                 new RegisteredBankAccountJpaEntity(
                         membershipId.getMembershipId(),
                         bankName.getBankName(),
                         bankAccountNumber.getBankAccountNumber(),
-                        linkedStatusIsValid.isLinkedStatusIsValid()
+                        linkedStatusIsValid.isLinkedStatusIsValid(),
+                        aggregateIdentifier.getAggregateIdentifier()
                 )
         );
     }
@@ -46,4 +48,6 @@ public class RegisteredBankAccountPersistenceAdapter implements RegisterBankAcco
         }
         return null;
     }
+
 }
+

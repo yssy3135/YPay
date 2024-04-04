@@ -6,12 +6,14 @@ import com.ypay.money.adapter.axon.command.MemberMoneyCreatedCommand;
 import com.ypay.money.adapter.axon.command.RechargingMoneyRequestCreateCommand;
 import com.ypay.money.adapter.axon.event.IncreaseMemberMoneyEvent;
 import com.ypay.money.adapter.axon.event.MemberMoneyCreatedEvent;
+import com.ypay.money.adapter.axon.event.RechargingRequestCreatedEvent;
 import com.ypay.money.application.port.out.GetRegisteredBankAccountPort;
 import com.ypay.money.application.port.out.RegisteredBankAccountAggregateIdentifier;
 import lombok.Data;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
+import org.axonframework.modelling.saga.StartSaga;
 import org.axonframework.spring.stereotype.Aggregate;
 
 import javax.validation.constraints.NotNull;
@@ -53,18 +55,29 @@ public class MemberMoneyAggregate {
     }
 
     @CommandHandler
-    public String handle(@NotNull RechargingMoneyRequestCreateCommand command, GetRegisteredBankAccountPort getRegisteredBankAccountPort){
+    public void handle(@NotNull RechargingMoneyRequestCreateCommand command, GetRegisteredBankAccountPort getRegisteredBankAccountPort){
         System.out.println("RechargingMoneyRequestCreateCommand Handler");
         id = command.getAggregateIdentifier();
 
-        // Saga Start
+
         // new RechargingRequestCreatedEvent
         // banking 정보가 필요하다.-> Money service이기 때문에  bank와 관련없음 -> bank svc (get registeredBankAccount)를 위한 port 생성하고 사용해야함.
         RegisteredBankAccountAggregateIdentifier registeredBankAccountAggregateIdentifier = getRegisteredBankAccountPort.getRegisteredBankAccount(command.getMembershipId());
 
-
+        // Saga Start
+        apply(new RechargingRequestCreatedEvent(
+           command.getRechargingRequestId(),
+           command.getMembershipId(),
+           command.getAmount(),
+           registeredBankAccountAggregateIdentifier.getAggregateIdentifier(),
+           registeredBankAccountAggregateIdentifier.getBankName(),
+           registeredBankAccountAggregateIdentifier.getBankAccountNumber()
+        ));
 
     }
+
+
+
 
     @EventSourcingHandler
     public void on(MemberMoneyCreatedEvent event) {

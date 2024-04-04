@@ -5,28 +5,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
-public class CheckRegisteredBankAccountCommand {
-
-
+public class RollbackFirmbankingRequestCommand {
+    private String rollbackFirmbankingId;
     @TargetAggregateIdentifier
-    private String aggregateIdentifier; // RegisteredBankAccount
-
+    private String aggregateIdentifier;
     private String rechargeRequestId;
-
     private String membershipId;
-
-    private String checkRegisterBankAccountId;
-
     private String bankName;
-
     private String bankAccountNumber;
-
-    private int amount;
-
-
-
-
+    private int moneyAmount;
 }

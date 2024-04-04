@@ -18,6 +18,8 @@ public class RegisteredBankAccount {
 
     @Getter private final boolean linkedStatusIsValid;
 
+    @Getter private final String aggregateIdentifier;
+
 
     // private final을 사용하는 이유는
     // AccessLevel.PRIVATE을 통해 객체 내부에서만 접근할 수 있도록 지정
@@ -30,14 +32,16 @@ public class RegisteredBankAccount {
           MembershipId membershipId,
           BankName bankName,
           BankAccountNumber bankAccountNumber,
-          LinkedStatusIsValid linkedStatusIsValid
+          LinkedStatusIsValid linkedStatusIsValid,
+          AggregateIdentifier aggregateIdentifier
     ) {
         return new RegisteredBankAccount(
                 registeredBankAccountId.registeredBankAccountId,
                 membershipId.membershipId,
                 bankName.bankName,
                 bankAccountNumber.bankAccountNumber,
-                linkedStatusIsValid.linkedStatusIsValid
+                linkedStatusIsValid.linkedStatusIsValid,
+                aggregateIdentifier.aggregateIdentifier
         );
     }
 
@@ -80,5 +84,13 @@ public class RegisteredBankAccount {
             this.linkedStatusIsValid = value;
         }
         boolean linkedStatusIsValid ;
+    }
+
+    @Value
+    public static class AggregateIdentifier {
+        public AggregateIdentifier(String value) {
+            this.aggregateIdentifier = value;
+        }
+        String aggregateIdentifier ;
     }
 }

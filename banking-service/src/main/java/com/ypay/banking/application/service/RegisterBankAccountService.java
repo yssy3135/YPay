@@ -59,7 +59,8 @@ public class RegisterBankAccountService implements RegisterBankAccountUseCase, G
                     new RegisteredBankAccount.MembershipId(command.getMembershipId()),
                     new RegisteredBankAccount.BankName(command.getBankName()),
                     new RegisteredBankAccount.BankAccountNumber(command.getBankAccountNumber()),
-                    new RegisteredBankAccount.LinkedStatusIsValid(command.isValid())
+                    new RegisteredBankAccount.LinkedStatusIsValid(command.isValid()),
+                    new RegisteredBankAccount.AggregateIdentifier("")
             );
 
             return mapper.mapToDomainEntity(registeredBankAccountJpaEntity);
@@ -71,26 +72,25 @@ public class RegisterBankAccountService implements RegisterBankAccountUseCase, G
 
     @Override
     public void registerBankAccountByEvent(RegisterBankAccountCommand command) {
-
         commandGateway.send(new CreateRegisteredBankAccountCommand(command.getMembershipId(), command.getBankName(), command.getBankAccountNumber()))
-                .whenComplete((result, throwable) -> {
-                    if(throwable != null) {
-                        // 에러처리
-                        throwable.printStackTrace();
-
-                    } else {
-                        // 정상적으로 이벤트 소싱
-                        // -> registeredBankAccount 를 insert
-                        registerBankAccountPort.registerBankAccount(
-                                new RegisteredBankAccount.MembershipId(command.getMembershipId()),
-                                new RegisteredBankAccount.BankName(command.getBankName()),
-                                new RegisteredBankAccount.BankAccountNumber(command.getBankAccountNumber()),
-                                new RegisteredBankAccount.LinkedStatusIsValid(command.isValid())
-                        );
-                    }
-                });
-
+                .whenComplete(
+                        (result, throwable) -> {
+                            if(throwable != null) {
+                                throwable.printStackTrace();
+                            } else {
+                                // 정상적으로 이벤트 소싱.
+                                // -> registeredBankAccount 를 insert
+                                registerBankAccountPort.registerBankAccount(
+                                        new RegisteredBankAccount.MembershipId(command.getMembershipId()+""),
+                                        new RegisteredBankAccount.BankName(command.getBankName()),
+                                        new RegisteredBankAccount.BankAccountNumber(command.getBankAccountNumber()),
+                                        new RegisteredBankAccount.LinkedStatusIsValid(command.isValid()),
+                                        new RegisteredBankAccount.AggregateIdentifier(result.toString()));
+                            }
+                        }
+                );
     }
+
 
     @Override
     public RegisteredBankAccount getRegisteredBankAccount(GetRegisteredBankAccountCommand command) {
