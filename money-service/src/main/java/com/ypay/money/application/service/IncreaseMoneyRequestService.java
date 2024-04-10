@@ -178,7 +178,8 @@ public class IncreaseMoneyRequestService implements IncreaseMoneyRequestUseCase,
         commandGateway.send(new RechargingMoneyRequestCreateCommand(memberMoneyAggregateIdentifier,
                 UUID.randomUUID().toString(),
                 command.getTargetMembershipId(),
-                command.getAmount()))
+                command.getAmount())
+                )
                 .whenComplete(
                         (result, throwable) -> {
                             if (throwable != null) {

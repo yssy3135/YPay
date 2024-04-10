@@ -21,12 +21,4 @@ public class RechargingMoneyRequestCreateCommand {
     private String membershipId;
 
     private int amount;
-
-    private String registeredBankAccountAggregateIdentifier;
-
-    private String bankName;
-
-    private String bankAccountNumber;
-
-
 }

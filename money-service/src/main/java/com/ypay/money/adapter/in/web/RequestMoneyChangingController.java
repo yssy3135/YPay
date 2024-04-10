@@ -71,7 +71,23 @@ public class RequestMoneyChangingController {
         // registeredBankAccountUseCase.registerBankAccount(command)
         // -> MoneyChangingResultDetail
         // return decreaseMoneyRequestUseCase.decreaseMoneyChangingRequest(command);
-        return null;
+
+
+        IncreaseMoneyRequestCommand command = IncreaseMoneyRequestCommand.builder()
+                .targetMembershipId(request.getTargetMembershipId())
+                .amount(request.getAmount() * -1) // 사실상 감액
+                .build();
+
+        MoneyChangingRequest moneyChangingRequest = increaseMoneyRequestUseCase.increaseMoneyRequestAsync(command);
+
+        // MoneyChangingRequest -> MoneyChangingResultDetail
+        MoneyChangingResultDetail resultDetail = new MoneyChangingResultDetail(
+                moneyChangingRequest.getMoneyChangingRequestId(),
+                0,
+                0,
+                moneyChangingRequest.getChangingMoneyAmount()
+        );
+        return resultDetail;
     }
 
     @PostMapping(path = "/money/create-member-money")
