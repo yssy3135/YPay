@@ -59,8 +59,8 @@ public class RequestMoneyChangingController {
         return resultDetail;
     }
 
-    @PostMapping(path = "/money/decrease")
-    MoneyChangingResultDetail decreaseMoneyChangingRequest(@RequestBody DecreaseMoneyChangingRequest request) {
+    @PostMapping(path = "/money/decrease-eda")
+    void decreaseMoneyChangingRequest(@RequestBody DecreaseMoneyChangingRequest request) {
 //        RegisterBankAccountCommand command = RegisterBankAccountCommand.builder()
 //                .membershipId(request.getMembershipId())
 //                .bankName(request.getBankName())
@@ -71,23 +71,12 @@ public class RequestMoneyChangingController {
         // registeredBankAccountUseCase.registerBankAccount(command)
         // -> MoneyChangingResultDetail
         // return decreaseMoneyRequestUseCase.decreaseMoneyChangingRequest(command);
-
-
         IncreaseMoneyRequestCommand command = IncreaseMoneyRequestCommand.builder()
                 .targetMembershipId(request.getTargetMembershipId())
-                .amount(request.getAmount() * -1) // 사실상 감액
+                .amount(request.getAmount() * -1)
                 .build();
 
-        MoneyChangingRequest moneyChangingRequest = increaseMoneyRequestUseCase.increaseMoneyRequestAsync(command);
-
-        // MoneyChangingRequest -> MoneyChangingResultDetail
-        MoneyChangingResultDetail resultDetail = new MoneyChangingResultDetail(
-                moneyChangingRequest.getMoneyChangingRequestId(),
-                0,
-                0,
-                moneyChangingRequest.getChangingMoneyAmount()
-        );
-        return resultDetail;
+        increaseMoneyRequestUseCase.increaseMoneyRequestByEvent(command);
     }
 
     @PostMapping(path = "/money/create-member-money")

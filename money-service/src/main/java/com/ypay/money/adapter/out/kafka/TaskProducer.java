@@ -18,10 +18,10 @@ public class TaskProducer implements SendRechargingMoneyTaskPort {
 
     private final String topic;
 
-    public TaskProducer(@Value("${kafka.clusters.bootstrapservers}") String bootstrapservers,
+    public TaskProducer(@Value("${kafka.clusters.bootstrapservers}") String bootstrapServers,
                         @Value("${task.topic}") String topic) {
         Properties props = new Properties();
-        props.put("bootstrap.server", bootstrapservers);
+        props.put("bootstrap.servers", bootstrapServers);
         props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 
@@ -31,26 +31,25 @@ public class TaskProducer implements SendRechargingMoneyTaskPort {
 
     @Override
     public void sendRechargingMoneyTaskPort(RechargingMoneyTask task) {
-
-
-
+        this.sendMessage(task.getTaskID(), task);
     }
 
-    public void sendMessage(String key, RechargingMoneyTask task) {
+    public void sendMessage(String key, RechargingMoneyTask value) {
         ObjectMapper mapper = new ObjectMapper();
         String jsonStringToProduce;
+        // jsonString
         try {
-            jsonStringToProduce = mapper.writeValueAsString(task);
+            jsonStringToProduce = mapper.writeValueAsString(value);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
         ProducerRecord<String, String> record = new ProducerRecord<>(topic, key, jsonStringToProduce);
-
         producer.send(record, (metadata, exception) -> {
-            if(exception == null) {
-
+            if (exception == null) {
+                // System.out.println("Message sent successfully. Offset: " + metadata.offset());
             } else {
                 exception.printStackTrace();
+                // System.err.println("Failed to send message: " + exception.getMessage());
             }
         });
     }
