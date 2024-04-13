@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @PersistenceAdapter
 @RequiredArgsConstructor
@@ -81,5 +82,11 @@ public class MoneyChangingRequestPersistenceAdapter implements IncreaseMoneyPort
             return entity;
         }
         return  entityList.get(0);
+    }
+
+    @Override
+    public List<MemberMoneyJpaEntity> getMemberMoneyPort(List<String> membershipIds) {
+
+        return memberMoneyRepository.findMemberMoneyListByMembershipIds(membershipIds.stream().map(Long::parseLong).collect(Collectors.toList()));
     }
 }

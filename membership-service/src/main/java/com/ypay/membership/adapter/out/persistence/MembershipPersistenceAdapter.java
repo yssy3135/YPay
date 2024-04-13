@@ -7,6 +7,8 @@ import com.ypay.membership.application.port.out.RegisterMembershipPort;
 import com.ypay.membership.domain.Membership;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 @PersistenceAdapter
 @RequiredArgsConstructor
 public class MembershipPersistenceAdapter implements RegisterMembershipPort, FindMembershipPort, ModifyMembershipPort {
@@ -43,5 +45,12 @@ public class MembershipPersistenceAdapter implements RegisterMembershipPort, Fin
         entity.setValid(membershipIsValid.isValidValue());
 
         return membershipRepository.save(entity);
+    }
+
+
+    @Override
+    public List<MembershipJpaEntity> findMembershipListByAddress(Membership.MembershipAddress address) {
+
+        return membershipRepository.findByAddress(address.getAddressValue());
     }
 }

@@ -5,11 +5,7 @@ import com.ypay.money.domain.MemberMoney;
 
 import java.util.List;
 
-public interface GetMemberMoneyPort {
-
-    MemberMoneyJpaEntity getMemberMoney(
-            MemberMoney.MembershipId memberId
-    );
+public interface GetMemberMoneyListPort {
 
     List<MemberMoneyJpaEntity> getMemberMoneyPort(List<String> membershipIds);
 }

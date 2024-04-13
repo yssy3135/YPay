@@ -5,7 +5,6 @@ import com.ypay.common.CountDownLatchManager;
 import com.ypay.common.RechargingMoneyTask;
 import com.ypay.common.SubTask;
 import com.ypay.common.UseCase;
-import com.ypay.money.adapter.axon.command.IncreaseMemberMoneyCommand;
 import com.ypay.money.adapter.axon.command.MemberMoneyCreatedCommand;
 import com.ypay.money.adapter.axon.command.RechargingMoneyRequestCreateCommand;
 import com.ypay.money.adapter.out.persistence.MemberMoneyJpaEntity;
