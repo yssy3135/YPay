@@ -1,15 +1,16 @@
 package com.ypay.money.adapter.in.web;
 
 import com.ypay.common.WebAdapter;
-import com.ypay.money.application.port.in.CreateMemberMoneyCommand;
-import com.ypay.money.application.port.in.CreateMemberMoneyUseCase;
-import com.ypay.money.application.port.in.IncreaseMoneyRequestCommand;
-import com.ypay.money.application.port.in.IncreaseMoneyRequestUseCase;
+import com.ypay.money.application.port.in.*;
+import com.ypay.money.domain.MemberMoney;
 import com.ypay.money.domain.MoneyChangingRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @WebAdapter
 @RestController
@@ -19,6 +20,8 @@ public class RequestMoneyChangingController {
     private final IncreaseMoneyRequestUseCase increaseMoneyRequestUseCase;
 
     private final CreateMemberMoneyUseCase createMemberMoneyUseCase;
+
+    private final FindMemberMoneyUseCase findMemberMoneyUseCase;
 
 
     @PostMapping(path = "/money/increase")
@@ -97,6 +100,16 @@ public class RequestMoneyChangingController {
         increaseMoneyRequestUseCase.increaseMoneyRequestByEvent(command);
     }
 
+
+    @PostMapping(path = "/money/member-money")
+    List<MemberMoney> findMemberMoneyListByMembershipIds(@RequestBody FindMemberMoneyListByMembershipIdsRequest findMemberMoneyListByMembershipIdsRequest) {
+
+        FindMemberMoneyListByMembershipIdsCommand command = FindMemberMoneyListByMembershipIdsCommand.builder()
+                .membershipIds(findMemberMoneyListByMembershipIdsRequest.getMembershipIds())
+                .build();
+
+        return findMemberMoneyUseCase.findMemberMoneyListByMembershipIds(command);
+    }
 
 
 }
