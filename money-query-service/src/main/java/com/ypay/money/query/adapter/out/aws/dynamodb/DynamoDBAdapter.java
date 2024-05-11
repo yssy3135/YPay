@@ -19,6 +19,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
 
+import static org.springframework.http.RequestEntity.put;
+
 @Component
 public class DynamoDBAdapter implements GetMoneySumByRegionPort, InsertMoneyIncreaseEventByAddress {
     private static final String TABLE_NAME = "MoneyIncreaseEventByRegion";
@@ -149,21 +151,28 @@ public class DynamoDBAdapter implements GetMoneySumByRegionPort, InsertMoneyIncr
         }
     }
 
-    private void update(String id) {
+    private void updateItem(String pk, String sk, int balance) {
         try {
-            HashMap<String, Condition> attrMap = new HashMap<>();
-            attrMap.put("PK", Condition.builder()
-                    .attributeValueList(AttributeValue.builder().s(id).build())
-                    .comparisonOperator(ComparisonOperator.EQ)
-                    .build());
+            HashMap<String, AttributeValue> attrMap = new HashMap<>();
+            attrMap.put("PK", AttributeValue.builder().s(pk).build());
+            attrMap.put("SK", AttributeValue.builder().s(sk).build());
 
-            QueryRequest request = QueryRequest.builder()
+
+            UpdateItemRequest updateItemRequest = UpdateItemRequest.builder()
                     .tableName(TABLE_NAME)
-                    .keyConditions(attrMap)
+                    .key(attrMap)
+                    .attributeUpdates(
+                        new HashMap<String, AttributeValueUpdate>(){{
+                            put("balance", AttributeValueUpdate.builder()
+                                    .value(AttributeValue.builder().n(String.valueOf(balance)).build())
+                                    .action(AttributeAction.PUT)
+                                    .build());
+                        }}
+                    )
                     .build();
 
-            QueryResponse response = dynamoDbClient.query(request);
-            response.items().forEach((value) -> System.out.println(value));
+            UpdateItemResponse updateItemResponse = dynamoDbClient.updateItem(updateItemRequest);
+
         } catch (DynamoDbException e) {
             System.err.println("Error getting an item from the table: " + e.getMessage());
         }
