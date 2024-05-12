@@ -4,8 +4,7 @@ import com.ypay.payment.domain.Payment;
 
 import java.util.List;
 
-public interface RequestPaymentUseCase {
-    Payment requestPayment(RequestPaymentCommand command);
+public interface RequestNormalStatusPaymentUseCase {
 
-
+    List<Payment> getNormalStatusPayments();
 }
