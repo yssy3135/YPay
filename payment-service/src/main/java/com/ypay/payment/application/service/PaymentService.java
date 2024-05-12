@@ -1,17 +1,16 @@
 package com.ypay.payment.application.service;
 
-import com.ypay.payment.application.port.in.RequestPaymentCommand;
-import com.ypay.payment.application.port.in.RequestPaymentUseCase;
-import com.ypay.payment.application.port.out.CreatePaymentPort;
-import com.ypay.payment.application.port.out.GetMembershipPort;
-import com.ypay.payment.application.port.out.GetRegisteredBankAccountPort;
+import com.ypay.payment.application.port.in.*;
+import com.ypay.payment.application.port.out.*;
 import com.ypay.payment.domain.Payment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
-public class PaymentService implements RequestPaymentUseCase {
+public class PaymentService implements RequestPaymentUseCase, RequestNormalStatusPaymentUseCase, FinishPaymentUseCase {
 
 
     private final CreatePaymentPort createPaymentPort;
@@ -20,7 +19,11 @@ public class PaymentService implements RequestPaymentUseCase {
 
     private final GetRegisteredBankAccountPort getRegisteredBankAccountPort;
 
-    // TODO Money Service ->
+    private final GetNormalStatusPaymentPort getNormalStatusPaymentPort;
+
+    private final ChangePaymentRequestStatusPort changePaymentRequestStatusPort;
+
+
 
     @Override
     public Payment requestPayment(RequestPaymentCommand command) {
@@ -38,4 +41,18 @@ public class PaymentService implements RequestPaymentUseCase {
                 command.getFranchiseFeeRate()
         );
     }
+
+
+    @Override
+    public List<Payment> getNormalStatusPayments() {
+
+        return getNormalStatusPaymentPort.getNormalStatusPayments();
+    }
+
+    @Override
+    public void finishPayment(FinishSettlementCommand finishSettlementCommand) {
+        changePaymentRequestStatusPort.changePaymentRequestStatus(finishSettlementCommand.getPaymentId(), 2);
+    }
+
+
 }

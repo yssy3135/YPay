@@ -1,13 +1,12 @@
 package com.ypay.money.query.adapter.out.aws.dynamodb;
 
 import com.ypay.money.query.adapter.axon.QueryMoneySumByAddress;
-import com.ypay.money.query.application.port.out.GetMoneySumByRegionPort;
+import com.ypay.money.query.application.port.out.GetMoneySumByAddressPort;
 import com.ypay.money.query.application.port.out.InsertMoneyIncreaseEventByAddress;
 import com.ypay.money.query.application.port.out.MoneySum;
 import com.ypay.money.query.domain.MoneySumByRegion;
 import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.format.datetime.DateFormatter;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -15,14 +14,13 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.UUID;
 
-import static org.springframework.http.RequestEntity.put;
-
 @Component
-public class DynamoDBAdapter implements GetMoneySumByRegionPort, InsertMoneyIncreaseEventByAddress {
+public class DynamoDBAdapter implements GetMoneySumByAddressPort, InsertMoneyIncreaseEventByAddress {
     private static final String TABLE_NAME = "MoneyIncreaseEventByRegion";
 
     @Value("AWS_ACCESS_KEY")
@@ -45,9 +43,13 @@ public class DynamoDBAdapter implements GetMoneySumByRegionPort, InsertMoneyIncr
     }
 
     @Override
-    public MoneySum getMoneySumByRegionPort(String regionName, Date startDate) {
+    public int getMoneySumByAddressPort(String address) {
 
-        return null;
+        String pk = address;
+        String sk = "-1";
+        MoneySumByAddress moneySumByAddress = getItem(pk, sk);
+
+        return moneySumByAddress.getBalance();
     }
 
 
@@ -58,7 +60,7 @@ public class DynamoDBAdapter implements GetMoneySumByRegionPort, InsertMoneyIncr
         // 1. raw event insert (Insert, put)
         // PK: 강남구#230728 SK: 5,000
 
-        String pk = addressName + "#" + new DateFormatter("yyMMdd").print(new Date(), null);
+        String pk = addressName + "#" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMdd"));
         String sk = String.valueOf(moneyIncrease);
 
         putItem(pk, sk, moneyIncrease);
@@ -70,9 +72,13 @@ public class DynamoDBAdapter implements GetMoneySumByRegionPort, InsertMoneyIncr
         String summarySk = "-1";
         MoneySumByAddress moneySumByAddress = getItem(summaryPk, summarySk);
 
-        int balance = moneySumByAddress.getBalance();
-        balance += moneyIncrease;
-        putItem(summaryPk, summarySk, balance);
+        if(moneySumByAddress == null) {
+            putItem(summaryPk, summarySk, moneyIncrease);
+        } else {
+            int balance = moneySumByAddress.getBalance();
+            balance += moneyIncrease;
+            updateItem(summaryPk, summarySk, balance);
+        }
 
         // 2-2 지역별 정보
         // - PK: 강남구 SK: -1 balance: + 5,000
@@ -81,11 +87,13 @@ public class DynamoDBAdapter implements GetMoneySumByRegionPort, InsertMoneyIncr
         String summarySk2 = "-1";
         MoneySumByAddress moneySumByAddress2 = getItem(summaryPk2, summarySk2);
 
-        int balance2 = moneySumByAddress2.getBalance();
-        balance2 += moneyIncrease;
-        putItem(summaryPk2, summarySk2, balance2);
-
-
+        if(moneySumByAddress2 == null) {
+            putItem(summaryPk2, summarySk2, moneyIncrease);
+        } else {
+            int balance2 = moneySumByAddress2.getBalance();
+            balance2 += moneyIncrease;
+            putItem(summaryPk2, summarySk2, balance2);
+        }
 
     }
 
@@ -121,9 +129,14 @@ public class DynamoDBAdapter implements GetMoneySumByRegionPort, InsertMoneyIncr
                     .build();
 
             GetItemResponse response = dynamoDbClient.getItem(request);
-            response.item().forEach((key, value) -> System.out.println(key + ": " + value));
 
-            return moneySumByAddressMapper.mapToMoneySumByAddress(response.item());
+            if(response.hasItem()) {
+                return moneySumByAddressMapper.mapToMoneySumByAddress(response.item());
+
+            } else {
+              return null;
+            }
+
         } catch (DynamoDbException e) {
             System.err.println("Error getting an item from the table: " + e.getMessage());
         }
@@ -180,10 +193,14 @@ public class DynamoDBAdapter implements GetMoneySumByRegionPort, InsertMoneyIncr
 
     @QueryHandler
     public MoneySumByRegion query (QueryMoneySumByAddress query){
+
+
+
         return MoneySumByRegion.generateMoneySumByRegion(
                 new MoneySumByRegion.MoneySumByRegionId(UUID.randomUUID().toString()),
                 new MoneySumByRegion.RegionName(query.getAddress()),
-                new MoneySumByRegion.MoneySum(1000)
+                new MoneySumByRegion.MoneySum(getMoneySumByAddressPort(query.getAddress()))
         );
     }
+
 }
