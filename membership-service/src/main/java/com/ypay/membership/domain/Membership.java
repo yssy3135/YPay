@@ -20,6 +20,8 @@ public class Membership {
 
     @Getter private final boolean isCrop;
 
+    @Getter private final String refreshToken;
+
     // private final을 사용하는 이유는
     // AccessLevel.PRIVATE을 통해 객체 내부에서만 접근할 수 있도록 지정
     // 오염이 되면 안되는 도메인 클래스
@@ -32,7 +34,8 @@ public class Membership {
             MembershipEmail membershipEmail,
             MembershipAddress membershipAddress,
             MembershipIsValid membershipIsValid,
-            MembershipIsCorp membershipIsCorp
+            MembershipIsCorp membershipIsCorp,
+            MembershipRefreshToken membershipRefreshToken
 
     ) {
         return new Membership(
@@ -41,7 +44,8 @@ public class Membership {
                 membershipEmail.emailValue,
                 membershipAddress.addressValue,
                 membershipIsValid.isValidValue,
-                membershipIsCorp.isCorpValue
+                membershipIsCorp.isCorpValue,
+                membershipRefreshToken.refreshTokenValue
         );
     }
 
@@ -108,6 +112,15 @@ public class Membership {
         }
 
         boolean isCorpValue;
+    }
+
+    @Value
+    public static class MembershipRefreshToken {
+        public MembershipRefreshToken(String value) {
+            this.refreshTokenValue = value;
+        }
+
+        String refreshTokenValue;
     }
 
 }

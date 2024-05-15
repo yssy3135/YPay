@@ -4,6 +4,7 @@ import com.ypay.common.PersistenceAdapter;
 import com.ypay.membership.application.port.out.FindMembershipPort;
 import com.ypay.membership.application.port.out.ModifyMembershipPort;
 import com.ypay.membership.application.port.out.RegisterMembershipPort;
+import com.ypay.membership.domain.JwtToken;
 import com.ypay.membership.domain.Membership;
 import lombok.RequiredArgsConstructor;
 
@@ -25,7 +26,8 @@ public class MembershipPersistenceAdapter implements RegisterMembershipPort, Fin
                     membershipAddress.getAddressValue(),
                     membershipEmail.getEmailValue(),
                     membershipIsValid.isValidValue(),
-                    membershipIsCorp.isCorpValue()
+                    membershipIsCorp.isCorpValue(),
+                    null
             )
         );
     }
