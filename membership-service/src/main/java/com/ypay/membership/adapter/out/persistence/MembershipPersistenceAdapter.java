@@ -55,4 +55,18 @@ public class MembershipPersistenceAdapter implements RegisterMembershipPort, Fin
 
         return membershipRepository.findByAddress(address.getAddressValue());
     }
+
+
+    @Override
+    public MembershipJpaEntity modifyMembership(Membership.MembershipId membershipId, Membership.MembershipName membershipName, Membership.MembershipEmail membershipEmail, Membership.MembershipAddress membershipAddress, Membership.MembershipIsValid membershipIsValid, Membership.MembershipIsCorp membershipIsCorp, Membership.MembershipRefreshToken membershipRefreshToken) {
+        MembershipJpaEntity entity = findMembership(membershipId);
+        entity.setName(membershipName.getNameValue());
+        entity.setAddress(membershipAddress.getAddressValue());
+        entity.setEmail(membershipEmail.getEmailValue());
+        entity.setCorp(membershipIsCorp.isCorpValue());
+        entity.setValid(membershipIsValid.isValidValue());
+        entity.setRefreshToken(membershipRefreshToken.getRefreshTokenValue());
+
+        return membershipRepository.save(entity);
+    }
 }

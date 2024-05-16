@@ -1,9 +1,6 @@
 package com.ypay.membership.adapter.in.web;
 
-import com.ypay.membership.application.port.in.AuthMembershipUseCase;
-import com.ypay.membership.application.port.in.LoginMembershipCommand;
-import com.ypay.membership.application.port.in.RefreshTokenCommand;
-import com.ypay.membership.application.port.in.RegisterMembershipUseCase;
+import com.ypay.membership.application.port.in.*;
 import com.ypay.membership.domain.JwtToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,6 +36,14 @@ public class AuthMembershipController {
     }
 
 
+    @PostMapping(path = "/membership/token-validate")
+    boolean validateToken(@RequestBody ValidateTokenRequest request) {
+        ValidateTokenCommand command = ValidateTokenCommand.builder()
+                .jwtToken(request.getJwtToken())
+                .build();
+
+        return authMembershipUseCase.validateJwtToken(command);
+    }
 
 
 
