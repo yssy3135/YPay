@@ -8,10 +8,10 @@ services:
     ports:
       - "8024:8024"
       - "8124:8124"
-    volumes:
-      - axonserver-data:/axonserver/data
-      - axonserver-events:/axonserver/events
-      - axonserver-config:/axonserver/config:ro
+#    volumes:
+#      - axonserver-data:/axonserver/data
+#      - axonserver-events:/axonserver/events
+#      - axonserver-config:/axonserver/config:ro
   mysql:
     image: mysql:8.0
     networks:
@@ -50,6 +50,10 @@ services:
       - SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop
       - KAFKA_CLUSTERS_BOOTSTRAPSERVERS=kafka:29092
       - LOGGING_TOPIC=ypay.logging.out.stdout
+      - SPRING_CLOUD_VAULT_TOKEN=${SPRING_CLOUD_VAULT_TOKEN}
+      - SPRING_CLOUD_VAULT_SCHEME=http
+      - SPRING_CLOUD_VAULT_HOST=vault
+      - SPRING_CLOUD_VAULT_PORT=8200
 
   banking-service:
     image: ypay-banking-service:1.0.0
@@ -226,7 +230,7 @@ services:
     networks:
       - ypay_network
     ports:
-      - "8087:8080"
+      - "8086:8080"
     restart: always
     depends_on:
       - kafka
@@ -242,7 +246,7 @@ services:
       - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.MySQL5InnoDBDialect
       - SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop
       - KAFKA_CLUSTERS_BOOTSTRAPSERVERS=kafka:29092
-      - LOGGING_TOPIC=fastcampus.logging.out.stdout
+      - LOGGING_TOPIC=ypay.logging.out.stdout
       - SERVICE_MEMBERSHIP_URL=http://membership-service:8080
       - SERVICE_BANKING_URL=http://banking-service:8080
       - SERVICE_MONEY_URL=http://money-service:8080
@@ -269,7 +273,7 @@ services:
       - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.MySQL5InnoDBDialect
       - SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop
       - KAFKA_CLUSTERS_BOOTSTRAPSERVERS=kafka:29092
-      - LOGGING_TOPIC=fastcampus.logging.out.stdout
+      - LOGGING_TOPIC=ypay.logging.out.stdout
       - SERVICE_MEMBERSHIP_URL=http://membership-service:8080
       - SERVICE_BANKING_URL=http://banking-service:8080
       - SERVICE_MONEY_URL=http://money-service:8080
@@ -277,6 +281,18 @@ services:
       - AWS_SECRET_KEY=${AWS_SECRET_KEY}
     env_file:
       - ${COMPOSE_PROFILES}.env
+
+  vault:
+    image: vault:1.13.1
+    networks:
+      - ypay_network
+    container_name: vault
+    ports:
+      - "8200:8200"
+    restart: always
+    cap_add:
+      - IPC_LOCK
+
 
 
 volumes:
