@@ -13,7 +13,8 @@ public class MembershipMapper {
                 new Membership.MembershipEmail(entity.getEmail()),
                 new Membership.MembershipAddress(entity.getAddress()),
                 new Membership.MembershipIsValid(entity.isValid()),
-                new Membership.MembershipIsCorp(entity.isCorp())
+                new Membership.MembershipIsCorp(entity.isCorp()),
+                new Membership.MembershipRefreshToken(entity.getRefreshToken())
         );
     }
 

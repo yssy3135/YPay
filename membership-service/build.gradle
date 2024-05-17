@@ -2,15 +2,9 @@ plugins {
     id 'com.palantir.docker' version '0.25.0'
 }
 
-compileJava {
-    sourceCompatibility = 11
-    targetCompatibility = 11
+ext{
+    axonVersion = "4.8.0"
 }
-
-apply plugin: 'java'
-apply plugin: 'java-library'
-apply plugin: 'org.springframework.boot'
-apply plugin: 'io.spring.dependency-management'
 
 group = 'com.ypay.membership'
 version = '1.0.0'
@@ -30,8 +24,15 @@ dependencies {
 
     testImplementation 'junit:junit:4.13.1'
     runtimeOnly 'mysql:mysql-connector-java'
-//    implementation group: 'org.axonframework', name: 'axon-configuration', version: "$axonVersion"
-//    implementation group: 'org.axonframework', name: 'axon-spring-boot-starter', version: "$axonVersion"
+    implementation group: 'org.axonframework', name: 'axon-configuration', version: "$axonVersion"
+    implementation group: 'org.axonframework', name: 'axon-spring-boot-starter', version: "$axonVersion"
+
+
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.11.2'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.2'
+
+    implementation group: 'org.springframework.vault', name: 'spring-vault-core', version: '2.3.3'
 }
 
 
